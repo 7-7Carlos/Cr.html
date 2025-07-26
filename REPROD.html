@@ -286,80 +286,87 @@
       transform-style: preserve-3d;
     }
 
-    /* Nuevos efectos para todos los botones */
+    /* ===== EFECTOS 3D GRUESOS Y FLOTANTES PARA TODOS LOS BOTONES ===== */
     .control-button,
     .action-button,
     .folder-select-button,
     .close-button,
     .eq-preset {
-      border: none;
+      /* Base del botón con apariencia 3D gruesa */
+      border: 4px solid rgba(255, 255, 255, 0.3) !important;
       box-shadow: 
-        0 15px 35px rgba(0, 0, 0, 0.8),
-        0 10px 20px rgba(0,0,0,0.5),
-        0 0 15px rgba(255, 107, 0, 0.7),
-        var(--btn-inner-shadow);
-      background: rgba(30, 30, 30, 0.4) !important; /* Color base */
+        /* Sombra principal profunda para elevación */
+        0 25px 50px rgba(0, 0, 0, 0.9),
+        /* Sombra secundaria para más profundidad */
+        0 15px 30px rgba(0, 0, 0, 0.7),
+        /* Resplandor de neón */
+        0 0 25px rgba(255, 107, 0, 0.8),
+        /* Borde interior para efecto hundido */
+        inset 0 3px 6px rgba(255, 255, 255, 0.2),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+        /* Resplandor exterior adicional */
+        0 0 40px rgba(255, 107, 0, 0.5) !important;
+      
+      background: var(--button-bg, rgba(40, 40, 40, 0.8)) !important;
       border-radius: 50%;
       cursor: pointer;
-      transform: translateY(-10px) scale(1.05) perspective(1000px) rotateX(10deg);
+      /* Transformación 3D inicial elevada */
+      transform: translateY(-15px) translateZ(25px) rotateX(12deg) rotateY(8deg) scale(1.1) perspective(1200px) !important;
       position: relative;
-      overflow: visible;
-      
-      /* Efecto 3D - Borde inferior */
-      &::before {
-        content: '';
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        bottom: -10px;
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 50%;
-        z-index: -1;
-        filter: blur(5px);
-        transform: translateZ(-20px);
-        transition: all 0.3s ease;
-      }
-      
-      /* Efecto 3D - Borde lateral */
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 50%;
-        border: 3px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 
-          inset 0 0 15px rgba(255, 255, 255, 0.1),
-          0 0 20px rgba(0, 0, 0, 0.8);
-        pointer-events: none;
-      }
+      overflow: visible !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      will-change: transform, box-shadow, background;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+      will-change: transform, box-shadow, background, border-color;
       
-      /* Efecto de neón pulsante y flotante */
-      animation: neonPulse 2s infinite alternate, float3D 6s ease-in-out infinite;
-      
-      /* Efecto de elevación 3D */
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
-        pointer-events: none;
-      }
+      /* Animación de flotación 3D constante */
+      animation: 
+        float3D 8s ease-in-out infinite,
+        neonPulse 3s infinite alternate,
+        colorCycle 25s infinite linear !important;
+    }
+    
+    /* Pseudo-elementos para efectos 3D adicionales */
+    .control-button::before,
+    .action-button::before,
+    .folder-select-button::before,
+    .close-button::before,
+    .eq-preset::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      z-index: -2;
+      filter: blur(8px);
+      transform: translateZ(-30px);
+      transition: all 0.4s ease;
+      /* Sombra de profundidad */
+    }
+    
+    .control-button::after,
+    .action-button::after,
+    .folder-select-button::after,
+    .close-button::after,
+    .eq-preset::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 
+        inset 0 0 20px rgba(255, 255, 255, 0.1),
+        0 0 30px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+      z-index: 1;
+      transition: all 0.4s ease;
     }
 
     /* Efecto 1: Pulsación de neón */
@@ -368,69 +375,125 @@
       100% { box-shadow: var(--btn-inner-shadow), 0 0 15px var(--accent-color); }
     }
 
-    /* Efecto 2: Resplandor al pasar el ratón */
+    /* ===== EFECTOS HOVER INTENSIFICADOS ===== */
     .control-button:hover,
     .action-button:hover,
     .folder-select-button:hover,
     .close-button:hover,
     .eq-preset:hover {
+      /* Sombras más dramáticas en hover */
       box-shadow: 
-        0 25px 45px rgba(0, 0, 0, 0.9),
-        0 15px 25px rgba(0,0,0,0.7),
-        0 0 25px rgba(255, 107, 0, 0.8),
-        var(--btn-hover-shadow);
-      transform: translateY(-15px) scale(1.1) perspective(1000px) rotateX(15deg);
-      filter: brightness(1.2);
-      animation: neonPulse 1s infinite alternate, float3D 4s ease-in-out infinite;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        0 35px 70px rgba(0, 0, 0, 1),
+        0 25px 45px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(255, 107, 0, 1),
+        inset 0 4px 8px rgba(255, 255, 255, 0.3),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(255, 107, 0, 0.7) !important;
       
-      &::before {
-        bottom: -15px;
-        filter: blur(8px);
-        background: rgba(0, 0, 0, 0.6);
-      }
+      /* Transformación 3D más pronunciada */
+      transform: translateY(-25px) translateZ(40px) rotateX(18deg) rotateY(12deg) scale(1.2) perspective(1500px) !important;
       
-      &::after {
-        border-color: rgba(255, 255, 255, 0.2);
-        box-shadow: 
-          inset 0 0 25px rgba(255, 255, 255, 0.2),
-          0 0 30px rgba(0, 0, 0, 1);
-      }
+      /* Borde más brillante */
+      border-color: rgba(255, 255, 255, 0.6) !important;
+      
+      /* Efectos visuales mejorados */
+      filter: brightness(1.3) saturate(1.2);
+      
+      /* Animación más rápida en hover */
+      animation: 
+        float3D 4s ease-in-out infinite,
+        neonPulse 1.5s infinite alternate,
+        colorCycle 15s infinite linear !important;
+      
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    }
+    
+    /* Efectos de pseudo-elementos en hover */
+    .control-button:hover::before,
+    .action-button:hover::before,
+    .folder-select-button:hover::before,
+    .close-button:hover::before,
+    .eq-preset:hover::before {
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      filter: blur(12px);
+      background: rgba(0, 0, 0, 0.8);
+      transform: translateZ(-45px);
+    }
+    
+    .control-button:hover::after,
+    .action-button:hover::after,
+    .folder-select-button:hover::after,
+    .close-button:hover::after,
+    .eq-preset:hover::after {
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 
+        inset 0 0 30px rgba(255, 255, 255, 0.2),
+        0 0 50px rgba(0, 0, 0, 1),
+        0 0 25px rgba(255, 107, 0, 0.8);
     }
 
-    /* Efecto 3: Animación de profundidad al hacer clic */
+    /* ===== EFECTOS ACTIVE/CLICK MEJORADOS ===== */
     .control-button:active,
     .action-button:active,
     .folder-select-button:active,
     .close-button:active,
     .eq-preset:active,
     .eq-preset.active {
-      transform: translateY(-5px) scale(0.98) perspective(1000px) rotateX(5deg);
-      filter: brightness(0.9);
-      box-shadow: 
-        0 10px 20px rgba(0, 0, 0, 0.6),
-        0 5px 10px rgba(0,0,0,0.4),
-        0 0 10px rgba(255, 107, 0, 0.6),
-        var(--btn-inner-shadow);
+      /* Efecto de "presionar" hacia abajo */
+      transform: translateY(-5px) translateZ(10px) rotateX(8deg) rotateY(4deg) scale(0.95) perspective(1000px) !important;
       
-      &::before {
-        bottom: -5px;
-        filter: blur(2px);
-        background: rgba(0, 0, 0, 0.3);
-      }
-      
-      &::after {
-        border-color: var(--accent-color);
-        box-shadow: 
-          inset 0 0 15px rgba(255, 107, 0, 0.3),
-          0 0 20px rgba(0, 0, 0, 0.8);
-      }
-      transform: translateY(8px) scale(0.95) translateZ(var(--depth-1));
+      /* Sombras reducidas para simular presión */
       box-shadow: 
-        var(--btn-active-shadow),
-        inset 0 0 15px rgba(0,0,0,0.5);
-      filter: brightness(0.9);
-      animation: none;
+        0 8px 16px rgba(0, 0, 0, 0.8),
+        0 4px 8px rgba(0, 0, 0, 0.6),
+        0 0 15px rgba(255, 107, 0, 0.9),
+        inset 0 6px 12px rgba(0, 0, 0, 0.6),
+        inset 0 -2px 4px rgba(255, 255, 255, 0.1),
+        0 0 25px rgba(255, 107, 0, 0.4) !important;
+      
+      /* Borde activo más brillante */
+      border-color: var(--accent-color) !important;
+      
+      /* Efectos visuales de activación */
+      filter: brightness(1.1) saturate(1.3);
+      
+      /* Detener animaciones durante el click */
+      animation: none !important;
+      
+      transition: all 0.1s ease-out !important;
+    }
+    
+    /* Efectos de pseudo-elementos en active */
+    .control-button:active::before,
+    .action-button:active::before,
+    .folder-select-button:active::before,
+    .close-button:active::before,
+    .eq-preset:active::before,
+    .eq-preset.active::before {
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      filter: blur(4px);
+      background: rgba(0, 0, 0, 0.4);
+      transform: translateZ(-15px);
+    }
+    
+    .control-button:active::after,
+    .action-button:active::after,
+    .folder-select-button:active::after,
+    .close-button:active::after,
+    .eq-preset:active::after,
+    .eq-preset.active::after {
+      border-color: var(--accent-color);
+      border-width: 3px;
+      box-shadow: 
+        inset 0 0 25px rgba(255, 107, 0, 0.4),
+        0 0 30px rgba(0, 0, 0, 0.9),
+        0 0 15px rgba(255, 107, 0, 1);
     }
 
     .control-button svg,
@@ -1324,72 +1387,110 @@
       display: block;
     }
     
+    /* ===== ANIMACIÓN DE FLOTACIÓN 3D MEJORADA ===== */
+    @keyframes float3D {
+      0%, 100% { 
+        transform: translateY(-15px) translateZ(25px) rotateX(12deg) rotateY(8deg) scale(1.1) perspective(1200px) translateX(0px);
+      }
+      25% { 
+        transform: translateY(-20px) translateZ(30px) rotateX(15deg) rotateY(10deg) scale(1.12) perspective(1200px) translateX(3px);
+      }
+      50% { 
+        transform: translateY(-10px) translateZ(35px) rotateX(10deg) rotateY(12deg) scale(1.08) perspective(1200px) translateX(-2px);
+      }
+      75% { 
+        transform: translateY(-18px) translateZ(28px) rotateX(14deg) rotateY(6deg) scale(1.1) perspective(1200px) translateX(1px);
+      }
+    }
+
     @keyframes floatMultiDirection {
       0% {
-        transform: translate(0, 0) rotate(0deg) translateZ(20px) rotateX(10deg) rotateY(15deg);
+        transform: translateY(-15px) translateZ(25px) rotateX(12deg) rotateY(8deg) scale(1.1) perspective(1200px) translate(0, 0) rotate(0deg);
       }
       25% {
-        transform: translate(5px, -5px) rotate(2deg) translateZ(20px) rotateX(10deg) rotateY(15deg);
+        transform: translateY(-20px) translateZ(30px) rotateX(15deg) rotateY(10deg) scale(1.12) perspective(1200px) translate(4px, -3px) rotate(1deg);
       }
       50% {
-        transform: translate(-5px, 5px) rotate(-2deg) translateZ(20px) rotateX(10deg) rotateY(15deg);
+        transform: translateY(-10px) translateZ(35px) rotateX(10deg) rotateY(12deg) scale(1.08) perspective(1200px) translate(-3px, 4px) rotate(-1deg);
       }
       75% {
-        transform: translate(5px, 5px) rotate(1deg) translateZ(20px) rotateX(10deg) rotateY(15deg);
+        transform: translateY(-18px) translateZ(28px) rotateX(14deg) rotateY(6deg) scale(1.1) perspective(1200px) translate(2px, 2px) rotate(0.5deg);
       }
       100% {
-        transform: translate(0, 0) rotate(0deg) translateZ(20px) rotateX(10deg) rotateY(15deg);
+        transform: translateY(-15px) translateZ(25px) rotateX(12deg) rotateY(8deg) scale(1.1) perspective(1200px) translate(0, 0) rotate(0deg);
       }
     }
 
-    /* Aplica la animación a todos los botones indicados */
-    button,
-    .control-button,
-    .action-button,
-    .folder-select-button,
-    .close-button,
-    .eq-preset {
-      animation-name: floatMultiDirection;
-      animation-duration: 4s;
-      animation-timing-function: ease-in-out;
-      animation-iteration-count: infinite;
-      animation-direction: alternate;
-      /* Optimización para reducir calentamiento */
-      contain: layout style paint;
-      /* Reducir complejidad en móviles */
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
+    /* ===== APLICACIÓN DE ANIMACIONES CON DELAYS ESCALONADOS ===== */
+    /* Control Buttons (3 botones principales) */
+    .control-button:nth-child(1) { 
+      animation-delay: 0s, 0.5s, 2s !important;
+    }
+    .control-button:nth-child(2) { 
+      animation-delay: 0.8s, 1s, 4s !important;
+    }
+    .control-button:nth-child(3) { 
+      animation-delay: 1.6s, 1.5s, 6s !important;
     }
 
-    /* Control Buttons (3 botones) */
-    .control-button:nth-of-type(1) { animation-delay: 0s; }
-    .control-button:nth-of-type(2) { animation-delay: 0.6s; }
-    .control-button:nth-of-type(3) { animation-delay: 1.2s; }
+    /* Action Buttons (botones de acción) */
+    .action-button:nth-child(1) { 
+      animation-delay: 0.4s, 0.7s, 3s !important;
+    }
+    .action-button:nth-child(2) { 
+      animation-delay: 1.2s, 1.2s, 5s !important;
+    }
+    .action-button:nth-child(3) { 
+      animation-delay: 2s, 1.8s, 7s !important;
+    }
+    .action-button:nth-child(4) { 
+      animation-delay: 2.8s, 2.3s, 9s !important;
+    }
+    .action-button:nth-child(5) { 
+      animation-delay: 3.6s, 2.8s, 11s !important;
+    }
+    .action-button:nth-child(6) { 
+      animation-delay: 4.4s, 3.3s, 13s !important;
+    }
+    .action-button:nth-child(7) { 
+      animation-delay: 5.2s, 3.8s, 15s !important;
+    }
 
-    /* Action Buttons (7 botones) */
-    .action-button:nth-of-type(1) { animation-delay: 0.3s; }
-    .action-button:nth-of-type(2) { animation-delay: 0.9s; }
-    .action-button:nth-of-type(3) { animation-delay: 1.5s; }
-    .action-button:nth-of-type(4) { animation-delay: 2.1s; }
-    .action-button:nth-of-type(5) { animation-delay: 2.7s; }
-    .action-button:nth-of-type(6) { animation-delay: 3.3s; }
-    .action-button:nth-of-type(7) { animation-delay: 3.9s; }
+    /* Folder Select Buttons */
+    .folder-select-button:nth-child(1) { 
+      animation-delay: 0.6s, 0.9s, 8s !important;
+    }
+    .folder-select-button:nth-child(2) { 
+      animation-delay: 1.4s, 1.4s, 10s !important;
+    }
+    .folder-select-button:nth-child(3) { 
+      animation-delay: 2.2s, 1.9s, 12s !important;
+    }
 
-    /* Folder Select Buttons (3 botones) */
-    .folder-select-button:nth-of-type(1) { animation-delay: 0.45s; }
-    .folder-select-button:nth-of-type(2) { animation-delay: 1.05s; }
-    .folder-select-button:nth-of-type(3) { animation-delay: 1.65s; }
+    /* Close Buttons */
+    .close-button:nth-child(1) { 
+      animation-delay: 0.2s, 0.6s, 4s !important;
+    }
+    .close-button:nth-child(2) { 
+      animation-delay: 1s, 1.1s, 6s !important;
+    }
+    .close-button:nth-child(3) { 
+      animation-delay: 1.8s, 1.6s, 8s !important;
+    }
 
-    /* Close Buttons (3 botones) */
-    .close-button:nth-of-type(1) { animation-delay: 0.15s; }
-    .close-button:nth-of-type(2) { animation-delay: 0.75s; }
-    .close-button:nth-of-type(3) { animation-delay: 1.35s; }
-
-    /* EQ Presets (4 botones) */
-    .eq-preset:nth-of-type(1) { animation-delay: 0.2s; }
-    .eq-preset:nth-of-type(2) { animation-delay: 0.8s; }
-    .eq-preset:nth-of-type(3) { animation-delay: 1.4s; }
-    .eq-preset:nth-of-type(4) { animation-delay: 2.0s; }
+    /* EQ Presets */
+    .eq-preset:nth-child(1) { 
+      animation-delay: 0.3s, 0.8s, 5s !important;
+    }
+    .eq-preset:nth-child(2) { 
+      animation-delay: 1.1s, 1.3s, 7s !important;
+    }
+    .eq-preset:nth-child(3) { 
+      animation-delay: 1.9s, 1.7s, 9s !important;
+    }
+    .eq-preset:nth-child(4) { 
+      animation-delay: 2.7s, 2.2s, 11s !important;
+    }
     
     #playlistContainer,
     #favoritesContainer {
@@ -2484,66 +2585,98 @@ body.player-active #playerContainer > * {
   opacity: 1 !important;
 } */
 
-/* ===== SOLUCIÓN FINAL: Estilo 3D Elevado y Animación Flotante Unificada ===== */
+    /* ===== FORZAR VISIBILIDAD Y FUNCIONALIDAD DE TODOS LOS BOTONES ===== */
+    .control-button,
+    .action-button,
+    .folder-select-button,
+    .close-button,
+    .eq-preset {
+      /* Asegurar que todos los botones sean visibles y funcionales */
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      
+      /* Asegurar que tengan dimensiones apropiadas */
+      min-width: 60px;
+      min-height: 60px;
+      
+      /* Forzar posición relativa para que se vean */
+      position: relative !important;
+      z-index: 10 !important;
+      
+      /* Asegurar que el contenido esté centrado */
+      align-items: center !important;
+      justify-content: center !important;
+      
+      /* Prevenir que otros elementos los oculten */
+      isolation: isolate;
+    }
 
-/* 1. Definición de la animación de flotación 3D */
-@keyframes float-and-elevate {
-  0%, 100% {
-    transform: translateZ(20px) rotateX(10deg) rotateY(15deg) translateY(0);
-  }
-  50% {
-    transform: translateZ(25px) rotateX(12deg) rotateY(17deg) translateY(-5px);
-  }
-}
+    /* ===== CORRECCIÓN PARA BOTONES DE VIDEO CONTROLS ===== */
+    .video-controls .action-button {
+      /* Asegurar visibilidad en controles de video */
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      position: relative !important;
+      z-index: 10005 !important;
+      
+      /* Dimensiones específicas para controles de video */
+      width: 60px !important;
+      height: 60px !important;
+      
+      /* Asegurar que mantengan los efectos 3D */
+      border: 4px solid rgba(255, 255, 255, 0.3) !important;
+      transform: translateY(-15px) translateZ(25px) rotateX(12deg) rotateY(8deg) scale(1.1) perspective(1200px) !important;
+    }
 
-/* 2. Regla CSS unificada para botones principales (elevados y flotantes) */
-.control-button:not(.close-button),
-.action-button,
-.folder-select-button,
-.eq-preset {
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  border: 1px solid rgba(255, 107, 0, 0.5);
-  box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.8), /* Sombra principal para elevación */
-    inset 0 2px 2px rgba(255, 255, 255, 0.2), /* Brillo interior superior */
-    inset 0 -2px 2px rgba(0, 0, 0, 0.3), /* Sombra interior inferior */
-    0 2px 2px rgba(255, 255, 255, 0.2); /* Borde iluminado */
-  animation: float-and-elevate 6s ease-in-out infinite, colorCycle 20s infinite linear;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: visible; /* Importante para que las sombras se vean */
-  position: relative;
-  will-change: transform;
-}
+    /* ===== ASEGURAR QUE LOS SVG DENTRO DE BOTONES SEAN VISIBLES ===== */
+    .control-button svg,
+    .action-button svg,
+    .folder-select-button svg,
+    .close-button svg,
+    .eq-preset svg,
+    .video-controls .action-button svg {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: none !important;
+      fill: currentColor !important;
+      width: 24px !important;
+      height: 24px !important;
+    }
 
-/* 3. Animación de flotación para botones circulares (como el de cerrar) */
-.close-button {
-    animation: float-and-elevate 6s ease-in-out infinite;
-}
+    /* ===== PREVENIR QUE ELEMENTOS PADRE OCULTEN BOTONES ===== */
+    .controls,
+    .action-buttons,
+    .video-controls,
+    .eq-presets {
+      /* Asegurar que los contenedores no oculten botones */
+      overflow: visible !important;
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      
+      /* Asegurar que los botones hijos sean visibles */
+      * {
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+    }
 
-/* 4. Efectos Hover y Active mejorados para reforzar el 3D */
-.control-button:not(.close-button):hover,
-.action-button:hover,
-.folder-select-button:hover,
-.eq-preset:hover {
-  transform: translateZ(35px) rotateX(15deg) rotateY(20deg) scale(1.1);
-  box-shadow: 
-    0 25px 45px rgba(0, 0, 0, 0.9),
-    inset 0 3px 3px rgba(255, 255, 255, 0.3),
-    inset 0 -3px 3px rgba(0, 0, 0, 0.4),
-    0 0 20px var(--accent-color);
-  filter: brightness(1.2);
-}
-
-.control-button:not(.close-button):active,
-.action-button:active,
-.folder-select-button:active,
-.eq-preset:active {
-  transform: translateZ(15px) rotateX(8deg) rotateY(12deg) scale(0.95);
-  box-shadow: 
-    0 5px 15px rgba(0, 0, 0, 0.7),
-    inset 0 3px 5px rgba(0, 0, 0, 0.5);
-  filter: brightness(0.9);
-}
+    /* ===== REGLA FINAL PARA FORZAR ANIMACIONES ===== */
+    button:not(:hover):not(:active),
+    .control-button:not(:hover):not(:active),
+    .action-button:not(:hover):not(:active),
+    .folder-select-button:not(:hover):not(:active),
+    .close-button:not(:hover):not(:active),
+    .eq-preset:not(:hover):not(:active) {
+      /* Forzar que las animaciones se ejecuten siempre */
+      animation-play-state: running !important;
+    }
 </style>
 </head>
 <body class="loading"> <!-- Eliminada la clase player-active -->
