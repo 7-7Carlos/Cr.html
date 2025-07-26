@@ -2394,37 +2394,35 @@
   100% { transform: translateZ(50px); opacity: 0; }
 }
 
-/* Mostrar solo el módulo activo */
-.player-container {
-  display: none;
-  opacity: 0;
-  visibility: hidden;
-}
+    /* Mostrar solo el módulo activo */
+    .player-container {
+      display: flex;
+      opacity: 1;
+      visibility: visible;
+    }
 
-/* Estilos para módulos secundarios */
-#playlistContainer,
-#favoritesContainer,
-#equalizerContainer,
-#videoPlayerContainer {
-  display: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  width: 90%;
-  height: 80%;
-  overflow: auto;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
+    /* Estilos para módulos secundarios */
+    #playlistContainer,
+    #favoritesContainer,
+    #equalizerContainer,
+    #videoPlayerContainer {
+      display: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow: auto;
+      z-index: 1000;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
 /* Asegurar que el contenido de los paneles ocupe el espacio disponible */
 #playlistContent,
@@ -2723,25 +2721,26 @@ function activateModule(moduleId) {
     if (modules[id]) {
       modules[id].classList.remove('active');
       modules[id].style.display = 'none';
+      modules[id].style.visibility = 'hidden';
+      modules[id].style.opacity = '0';
     }
   }
 
   // Mostrar y activar solo el módulo deseado
   if (modules[moduleId]) {
     modules[moduleId].style.display = 'block';
+    modules[moduleId].style.visibility = 'visible';
+    modules[moduleId].style.opacity = '1';
     modules[moduleId].classList.add('active');
     
     // Si es el módulo de video, asegurarse de que el contenedor sea visible
     if (moduleId === 'video') {
       const videoContainer = document.querySelector('.video-player-container');
       if (videoContainer) {
-        videoContainer.style.display = 'block';
+        videoContainer.style.display = 'flex';
+        videoContainer.style.visibility = 'visible';
+        videoContainer.style.opacity = '1';
         videoContainer.classList.add('visible');
-      }
-    } else {
-      // Si no es el módulo de video, asegurarse de que el reproductor esté visible
-      if (modules.player) {
-        modules.player.style.display = 'block';
       }
     }
   }
@@ -2759,16 +2758,18 @@ function activateModule(moduleId) {
 
     // Inicializar módulos
     function initializeModules() {
+      // Ocultar todos los módulos primero
+      for (const id in modules) {
+        if (modules[id]) {
+          modules[id].classList.remove('active');
+          modules[id].style.display = 'none';
+          modules[id].style.visibility = 'hidden';
+          modules[id].style.opacity = '0';
+        }
+      }
+      
       // Activar el módulo principal por defecto
       activateModule('player');
-      
-      // Desactivar todos los demás módulos (ya se maneja en activateModule, pero lo mantenemos por si acaso)
-      Object.keys(modules).forEach(key => {
-        if (key !== 'player') {
-          modules[key].classList.add('module-hidden'); // Esta clase no tiene reglas CSS, podemos quitarla si queremos simplificar
-          modules[key].classList.add('paused'); // Esta clase tampoco tiene reglas CSS, quitar si no se usa
-        }
-      });
     }
 
     // Resto del código JavaScript existente...
@@ -2860,6 +2861,7 @@ function activateModule(moduleId) {
     let currentVideoURL = null;
     let videoTimeouts = [];
     let videoIntervals = [];
+    let videoLoopMode = false; // Variable faltante agregada
     
     // Variables para fondo infinito
     let infiniteBackgroundContainer = document.getElementById('infiniteBackground');
@@ -2897,6 +2899,15 @@ function activateModule(moduleId) {
       setTimeout(() => {
         sonicWave.remove();
       }, 1500);
+    }
+
+    function hideNotification() {
+      notification.classList.remove('show');
+      notification.classList.add('hide');
+      if (window.notificationTimer) {
+        clearTimeout(window.notificationTimer);
+        window.notificationTimer = null;
+      }
     }
 
     function createParticles() {
@@ -3248,7 +3259,7 @@ function activateModule(moduleId) {
       audioPlayer.play().then(() => {
         isPlaying = true;
         playPauseIcon.setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
-        if (analyser) drawEQVisualizer ();
+        if (analyser) drawEQVisualizer();
         
         playPauseButton.classList.add('audio-distortion');
         setTimeout(() => {
@@ -3654,10 +3665,13 @@ function activateModule(moduleId) {
       const dataArray = new Uint8Array(bufferLength);
 
       function renderFrame() {
-        if (!isPlaying && audioContext.state !== 'running') { // Solo dibuja si está reproduciendo o el contexto está activo
+        if (!isPlaying || !audioContext || audioContext.state !== 'running') {
           // Si el audio está pausado o el contexto suspendido, limpiar y detener la animación
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          animationFrame = null; // Detener el bucle de animación
+          if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+            animationFrame = null;
+          }
           return;
         }
 
@@ -3810,12 +3824,6 @@ function activateModule(moduleId) {
         // Activar el módulo de video después de cargar
         activateModule('video');
         
-        // Asegurar que el contenedor sea visible
-        videoContainer.style.display = 'flex';
-        videoContainer.style.visibility = 'visible';
-        videoContainer.style.opacity = '1';
-        videoContainer.classList.add('visible');
-        
         // Intentar reproducir después de un pequeño retraso
         setTimeout(playVideoWithSound, 100);
         
@@ -3834,7 +3842,8 @@ function activateModule(moduleId) {
       // Cargar el video
       videoElement.load();
       currentVideoIndex = index;
-      videoPlayer.play().then(() => {
+      
+      videoElement.play().then(() => {
         isVideoPlaying = true;
         showNotification(`Reproduciendo: ${video.name}`);
       }).catch(e => {
@@ -3942,16 +3951,20 @@ function activateModule(moduleId) {
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOM Content Loaded - Iniciando aplicación');
+      
+      // 1. Inicializa el sistema de módulos, estableciendo el reproductor como activo.
       initializeModules();
+
+      // 2. Ejecuta el resto de las funciones de arranque.
       createParticles();
       updatePlaylistUI();
       updateFavoritesUI();
-      setButtonStylesAndRandomColors(); // Asegúrate de llamar a esta función si no lo hacías ya aquí.
-      
-      // Inicializar variable CSS para la animación del fondo
+      setButtonStylesAndRandomColors();
+
+      // 3. Inicializar variable CSS para la animación del fondo
       document.documentElement.style.setProperty('--tunnel-animation', 'running');
       
-      // Habilitar scroll en paneles de lista y favoritos
+      // 4. Habilitar scroll en paneles de lista y favoritos
       const enablePanelScroll = () => {
         const panels = document.querySelectorAll('#playlistContainer, #favoritesContainer');
         panels.forEach(panel => {
@@ -3979,22 +3992,24 @@ function activateModule(moduleId) {
       
       // Agregar efecto parallax al contenedor principal
       const playerContainer = document.getElementById('playerContainer');
-      playerContainer.addEventListener('mousemove', (e) => {
-        const rect = playerContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateY = (x - centerX) / centerX * 15;
-        const rotateX = (centerY - y) / centerY * 15;
-        
-        playerContainer.style.transform = `rotateX(${10 + rotateX}deg) rotateY(${15 + rotateY}deg) translateZ(var(--depth-3))`;
-        
-        // Actualizar posición para sombra dinámica
-        playerContainer.style.setProperty('--mouse-x', `${x}px`);
-        playerContainer.style.setProperty('--mouse-y', `${y}px`);
-      });
+      if (playerContainer) {
+        playerContainer.addEventListener('mousemove', (e) => {
+          const rect = playerContainer.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const rotateY = (x - centerX) / centerX * 15;
+          const rotateX = (centerY - y) / centerY * 15;
+          
+          playerContainer.style.transform = `rotateX(${10 + rotateX}deg) rotateY(${15 + rotateY}deg) translateZ(var(--depth-3))`;
+          
+          // Actualizar posición para sombra dinámica
+          playerContainer.style.setProperty('--mouse-x', `${x}px`);
+          playerContainer.style.setProperty('--mouse-y', `${y}px`);
+        });
+      }
       
       // Crear partículas de audio al hacer clic en cualquier botón
       document.querySelectorAll('button').forEach(button => {
@@ -4018,11 +4033,13 @@ function activateModule(moduleId) {
       // Motion Trail
       let isDragging = false;
       let lastX, lastY;
-      playerContainer.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        lastX = e.clientX;
-        lastY = e.clientY;
-      });
+      if (playerContainer) {
+        playerContainer.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          lastX = e.clientX;
+          lastY = e.clientY;
+        });
+      }
       document.addEventListener('mousemove', (e) => {
         if (isDragging) {
           const trail = document.createElement('div');
@@ -4038,7 +4055,11 @@ function activateModule(moduleId) {
       document.addEventListener('mouseup', () => {
         isDragging = false;
       });
+      
+      // 5. Finalmente, quita la clase 'loading' del body para mostrar todo.
       document.body.classList.remove('loading');
+
+      console.log('Aplicación inicializada correctamente. Módulo activo: player');
     });
     
     // ===== WAKE LOCK PARA MANTENER PANTALLA ACTIVA =====
@@ -4140,14 +4161,6 @@ function activateModule(moduleId) {
       // Restablecer los controles de video
       if (videoPauseIcon) videoPauseIcon.style.display = 'none';
       if (videoPlayIcon) videoPlayIcon.style.display = 'block';
-      
-      // Forzar un redibujado para asegurar que los cambios se apliquen
-      if (videoElement) {
-        void videoElement.offsetHeight; // Trigger reflow
-      }
-      
-      // Limpiar cualquier notificación anterior
-      hideNotification();
     }
 
     function randomColor() {
@@ -4189,23 +4202,6 @@ function activateModule(moduleId) {
     }
     const observer = new MutationObserver(setButtonStylesAndRandomColors);
     observer.observe(document.body, { childList: true, subtree: true });
-    // SOLUCIÓN: Inicialización correcta al cargar la página
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM Content Loaded - Iniciando aplicación');
-      // 1. Inicializa el sistema de módulos, estableciendo el reproductor como activo.
-      initializeModules();
-
-      // 2. Ejecuta el resto de las funciones de arranque.
-      createParticles();
-      updatePlaylistUI();
-      updateFavoritesUI();
-      setButtonStylesAndRandomColors(); // Asegúrate de llamar a esta función si no lo hacías ya aquí.
-
-      // 3. Finalmente, quita la clase 'loading' del body para mostrar todo.
-      document.body.classList.remove('loading');
-
-      console.log('Aplicación inicializada correctamente. Módulo activo: player');
-    });
   </script>
 </body>
 </html>
